@@ -1,0 +1,30 @@
+name: Prettier/ESLint
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Prettify code
+        uses: creyD/prettier_action@v3.1
+        with:
+          prettier_options: --write **/*.{tsx,md,ts}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          check-latest: true
+
+      - run: npm install
+      - run: npx eslint . --ext .js,.jsx,.ts,.tsx
