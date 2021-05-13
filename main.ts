@@ -1,112 +1,117 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {
+  App,
+  Plugin,
+  PluginSettingTab,
+  Setting, WorkspaceLeaf,
+} from "obsidian";
+import {VIEW_TYPE_POMODORO} from "./src/Constants";
+import {PomodoroTimerView} from "./src/PomodoroTimerView";
 
-interface MyPluginSettings {
-	mySetting: string;
+import moment from "moment";
+import momentDurationFormatSetup from "moment-duration-format";
+
+momentDurationFormatSetup(moment);
+
+
+interface PomodoroTimerPluginSettings {
+  pomodoroMinutes: number;
+  shortBreakMinutes: number;
+  longBreakMinutes: number;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+const DEFAULT_SETTINGS: PomodoroTimerPluginSettings = {
+  pomodoroMinutes: 25,
+  shortBreakMinutes: 5,
+  longBreakMinutes: 15,
+};
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class PomodoroTimerPlugin extends Plugin {
+  settings: PomodoroTimerPluginSettings;
 
-	async onload() {
-		console.log('loading plugin');
+  async onload(): Promise<void> {
+    console.log("loading PomodoroTimerPlugin");
 
-		await this.loadSettings();
+    await this.loadSettings();
 
-		this.addRibbonIcon('dice', 'Sample Plugin', () => {
-			new Notice('This is a notice!');
-		});
+    this.addSettingTab(new SampleSettingTab(this.app, this));
 
-		this.addStatusBarItem().setText('Status Bar Text');
+    this.registerView(VIEW_TYPE_POMODORO, (leaf: WorkspaceLeaf) => {
+      return new PomodoroTimerView(leaf, this);
+    });
 
-		this.addCommand({
-			id: 'open-sample-modal',
-			name: 'Open Sample Modal',
-			// callback: () => {
-			// 	console.log('Simple Callback');
-			// },
-			checkCallback: (checking: boolean) => {
-				let leaf = this.app.workspace.activeLeaf;
-				if (leaf) {
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
+    this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
+  }
 
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+  onunload(): void {
+    console.log("unloading PomodoroTimerPlugin");
+  }
 
-		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			console.log('codemirror', cm);
-		});
+  initLeaf(): void {
+    if (this.app.workspace.getLeavesOfType(VIEW_TYPE_POMODORO).length) {
+      return;
+    }
+    this.app.workspace.getRightLeaf(false).setViewState({
+      type: VIEW_TYPE_POMODORO,
+    });
+  }
 
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
+  async loadSettings(): Promise<void> {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
 
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-		console.log('unloading plugin');
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		let {contentEl} = this;
-		contentEl.empty();
-	}
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
+  }
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+  plugin: PomodoroTimerPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+  constructor(app: App, plugin: PomodoroTimerPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
 
-	display(): void {
-		let {containerEl} = this;
+  display(): void {
+    const {containerEl} = this;
 
-		containerEl.empty();
+    containerEl.empty();
 
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue('')
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+    const pomodoroSettings = new Setting(containerEl)
+        .setName("Pomodoro duration minutes")
+        .setDesc(`${this.plugin.settings.pomodoroMinutes} minutes`)
+        .addSlider((text) =>
+            text
+                .setValue(this.plugin.settings.pomodoroMinutes)
+                .onChange(async (value) => {
+                  this.plugin.settings.pomodoroMinutes = value;
+                  pomodoroSettings.setDesc(`${value} minutes`)
+                  await this.plugin.saveSettings();
+                })
+        );
+    const shortBreakSettings = new Setting(containerEl)
+        .setName("Short break minutes")
+        .setDesc(`${this.plugin.settings.shortBreakMinutes} minutes`)
+        .addSlider((text) =>
+            text
+                .setValue(this.plugin.settings.shortBreakMinutes)
+                .onChange(async (value) => {
+                  this.plugin.settings.shortBreakMinutes = value;
+                  shortBreakSettings.setDesc(`${value} minutes`)
+                  await this.plugin.saveSettings();
+                })
+        );
+    const longBreakSettings = new Setting(containerEl)
+        .setName("Long break minutes")
+        .setDesc(`${this.plugin.settings.longBreakMinutes} minutes`)
+        .addSlider((text) =>
+            text
+                .setValue(this.plugin.settings.longBreakMinutes)
+                .onChange(async (value) => {
+                  this.plugin.settings.longBreakMinutes = value;
+                  longBreakSettings.setDesc(`${value} minutes`)
+                  await this.plugin.saveSettings();
+                })
+        );
+  }
 }
