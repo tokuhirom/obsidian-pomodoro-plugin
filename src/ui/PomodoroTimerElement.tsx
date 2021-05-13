@@ -5,11 +5,10 @@ import moment from "moment";
 enum Mode {
   ModePomodoro,
   ModeShortBreak,
-  ModeLongBreak
+  ModeLongBreak,
 }
 
-namespace Mode {
-}
+namespace Mode {}
 
 interface PomodoroTimerElementProps {
   plugin: PomodoroTimerPlugin;
@@ -23,19 +22,21 @@ interface PomodoroTimerElementState {
   remainMilliSeconds: number;
 }
 
-
 export class PomodoroTimerElement extends React.Component<
-    PomodoroTimerElementProps,
-    PomodoroTimerElementState
-    > {
+  PomodoroTimerElementProps,
+  PomodoroTimerElementState
+> {
   private intervalId: number;
   constructor(props: PomodoroTimerElementProps) {
     super(props);
     this.state = {
       mode: Mode.ModePomodoro,
-      time: PomodoroTimerElement.getTimeString(this.props.plugin.settings.pomodoroMinutes * 60 * 1000),
+      time: PomodoroTimerElement.getTimeString(
+        this.props.plugin.settings.pomodoroMinutes * 60 * 1000
+      ),
       startedAt: null,
-      remainMilliSeconds: this.props.plugin.settings.pomodoroMinutes * 60 * 1000,
+      remainMilliSeconds:
+        this.props.plugin.settings.pomodoroMinutes * 60 * 1000,
     };
   }
 
@@ -45,11 +46,15 @@ export class PomodoroTimerElement extends React.Component<
     }
   }
 
-  componentDidUpdate(prevProps: Readonly<PomodoroTimerElementProps>, prevState: Readonly<PomodoroTimerElementState>, snapshot?: any) {
+  componentDidUpdate(
+    prevProps: Readonly<PomodoroTimerElementProps>,
+    prevState: Readonly<PomodoroTimerElementState>,
+    snapshot?: any
+  ) {
     if (
-        prevState.startedAt !== this.state.startedAt
-        || prevState.remainMilliSeconds !== this.state.remainMilliSeconds
-        || prevState.mode !== this.state.mode
+      prevState.startedAt !== this.state.startedAt ||
+      prevState.remainMilliSeconds !== this.state.remainMilliSeconds ||
+      prevState.mode !== this.state.mode
     ) {
       this.updateTime();
     }
@@ -82,50 +87,61 @@ export class PomodoroTimerElement extends React.Component<
 
   render(): JSX.Element {
     return (
-        <div className={"pomodoro-timer"}>
-          <div className={"mode-switchers-container"}>
-            <div
-                className={"pomodoro " + (this.state.mode == Mode.ModePomodoro ? 'enabled': '')}
-                onClick={this.switchToPomodoro.bind(this)}
-            >
-              Pomodoro
-            </div>
-            <div
-                className={"short-break " + (this.state.mode == Mode.ModeShortBreak ? 'enabled': '')}
-                onClick={this.switchToShortBreak.bind(this)}
-            >
-              Short Break
-            </div>
-            <div
-                className={"long-break " + (this.state.mode == Mode.ModeLongBreak ? 'enabled': '')}
-                onClick={this.switchToLongBreak.bind(this)}
-            >
-              Long Break
-            </div>
+      <div className={"pomodoro-timer"}>
+        <div className={"mode-switchers-container"}>
+          <div
+            className={
+              "pomodoro " +
+              (this.state.mode == Mode.ModePomodoro ? "enabled" : "")
+            }
+            onClick={this.switchToPomodoro.bind(this)}
+          >
+            Pomodoro
           </div>
-          <div className={"time " + (this.getElapsedMilliSeconds() < 0 ? 'over' : '')}>
-            {this.state.time}
+          <div
+            className={
+              "short-break " +
+              (this.state.mode == Mode.ModeShortBreak ? "enabled" : "")
+            }
+            onClick={this.switchToShortBreak.bind(this)}
+          >
+            Short Break
           </div>
-          <button onClick={this.onStartStop.bind(this)}>
-            {this.state.startedAt !== null ? 'Stop' : 'Start'}
-          </button>
-          <button onClick={this.onReset.bind(this)}>▶|</button>
+          <div
+            className={
+              "long-break " +
+              (this.state.mode == Mode.ModeLongBreak ? "enabled" : "")
+            }
+            onClick={this.switchToLongBreak.bind(this)}
+          >
+            Long Break
+          </div>
         </div>
+        <div
+          className={
+            "time " + (this.getElapsedMilliSeconds() < 0 ? "over" : "")
+          }
+        >
+          {this.state.time}
+        </div>
+        <button onClick={this.onStartStop.bind(this)}>
+          {this.state.startedAt !== null ? "Stop" : "Start"}
+        </button>
+        <button onClick={this.onReset.bind(this)}>▶|</button>
+      </div>
     );
   }
 
-
-
   private updateTime(): void {
     const ms = this.getElapsedMilliSeconds();
-    const str = PomodoroTimerElement.getTimeString(ms)
+    const str = PomodoroTimerElement.getTimeString(ms);
     this.setState({
-      time: str
-    })
+      time: str,
+    });
   }
 
   private static getTimeString(elapsed: number): string {
-    return moment.duration(elapsed).format('mm:ss', {
+    return moment.duration(elapsed).format("mm:ss", {
       trim: false,
     });
   }
@@ -183,11 +199,11 @@ export class PomodoroTimerElement extends React.Component<
     const plugin = this.props.plugin;
     switch (mode) {
       case Mode.ModePomodoro:
-        return plugin.settings.pomodoroMinutes*60*1000
+        return plugin.settings.pomodoroMinutes * 60 * 1000;
       case Mode.ModeShortBreak:
-        return plugin.settings.shortBreakMinutes*60*1000
+        return plugin.settings.shortBreakMinutes * 60 * 1000;
       case Mode.ModeLongBreak:
-        return plugin.settings.longBreakMinutes*60*1000
+        return plugin.settings.longBreakMinutes * 60 * 1000;
     }
     throw Error(`Unknown mode: ${mode}`);
   }

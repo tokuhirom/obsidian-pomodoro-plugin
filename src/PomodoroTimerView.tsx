@@ -1,9 +1,9 @@
-import {ItemView, WorkspaceLeaf} from "obsidian";
+import { ItemView, WorkspaceLeaf } from "obsidian";
 import PomodoroTimerPlugin from "../main";
-import {VIEW_TYPE_POMODORO} from "./Constants";
+import { VIEW_TYPE_POMODORO } from "./Constants";
 import React from "react";
 import ReactDOM from "react-dom";
-import {PomodoroTimerElement} from "./ui/PomodoroTimerElement";
+import { PomodoroTimerElement } from "./ui/PomodoroTimerElement";
 
 export class PomodoroTimerView extends ItemView {
   private readonly plugin: PomodoroTimerPlugin;
