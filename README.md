@@ -2,6 +2,8 @@
 
 "Obsidian Pomodoro Plugin" is a simple Pomodoro timer plugin for Obsidian (https://obsidian.md).
 
+![Animation.gif](Animation.gif)
+
 You can put a pomodoro timer in your obsidian window.
 
 ![img.png](img.png)
