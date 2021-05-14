@@ -8,8 +8,6 @@ enum Mode {
   ModeLongBreak,
 }
 
-namespace Mode {}
-
 interface PomodoroTimerElementProps {
   plugin: PomodoroTimerPlugin;
 }
@@ -48,9 +46,8 @@ export class PomodoroTimerElement extends React.Component<
 
   componentDidUpdate(
     prevProps: Readonly<PomodoroTimerElementProps>,
-    prevState: Readonly<PomodoroTimerElementState>,
-    snapshot?: any
-  ) {
+    prevState: Readonly<PomodoroTimerElementState>
+  ): void {
     if (
       prevState.startedAt !== this.state.startedAt ||
       prevState.remainMilliSeconds !== this.state.remainMilliSeconds ||
@@ -156,15 +153,15 @@ export class PomodoroTimerElement extends React.Component<
     }
   }
 
-  switchToPomodoro() {
+  switchToPomodoro(): void {
     this.switchMode(Mode.ModePomodoro);
   }
 
-  switchToShortBreak() {
+  switchToShortBreak(): void {
     this.switchMode(Mode.ModeShortBreak);
   }
 
-  switchToLongBreak() {
+  switchToLongBreak(): void {
     this.switchMode(Mode.ModeLongBreak);
   }
 
