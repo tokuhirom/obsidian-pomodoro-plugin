@@ -1,7 +1,7 @@
-name: Prettier/ESLint
+name: Prettier Write
 
 on:
-  push:
+  pull_request:
 
 jobs:
   prettier:
@@ -16,14 +16,6 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v3.1
         with:
-          prettier_options: "**/*.{tsx,md,ts}"
+          prettier_options: --write **/*.{tsx,md,ts}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-          check-latest: true
-
-      - run: npm install
-      - run: npx eslint . --ext .js,.jsx,.ts,.tsx
