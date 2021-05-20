@@ -49,7 +49,7 @@ export default class PomodoroTimerPlugin extends Plugin {
     this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
   }
 
-  onShow() {
+  onShow(): void {
     this.initLeaf();
   }
 
