@@ -14,7 +14,7 @@ export class PomodoroTimerView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "Stopwatch";
+    return "Pomodoro timer";
   }
 
   getViewType(): string {

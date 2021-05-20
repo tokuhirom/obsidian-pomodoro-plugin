@@ -39,7 +39,18 @@ export default class PomodoroTimerPlugin extends Plugin {
       return new PomodoroTimerView(leaf, this);
     });
 
+    this.addCommand({
+      id: 'pomodoro-show-pomodoro-timer',
+      name: "Show pomodoro timer",
+      mobileOnly: false,
+      callback: this.onShow.bind(this)
+    });
+
     this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
+  }
+
+  onShow() {
+    this.initLeaf();
   }
 
   onunload(): void {
