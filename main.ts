@@ -33,7 +33,7 @@ export default class PomodoroTimerPlugin extends Plugin {
 
     await this.loadSettings();
 
-    this.addSettingTab(new SampleSettingTab(this.app, this));
+    this.addSettingTab(new PomodoroSettingTab(this.app, this));
 
     this.registerView(VIEW_TYPE_POMODORO, (leaf: WorkspaceLeaf) => {
       return new PomodoroTimerView(leaf, this);
@@ -64,7 +64,7 @@ export default class PomodoroTimerPlugin extends Plugin {
   }
 }
 
-class SampleSettingTab extends PluginSettingTab {
+class PomodoroSettingTab extends PluginSettingTab {
   plugin: PomodoroTimerPlugin;
 
   constructor(app: App, plugin: PomodoroTimerPlugin) {
